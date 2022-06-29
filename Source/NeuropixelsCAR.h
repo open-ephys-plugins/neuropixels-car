@@ -20,20 +20,41 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef PROCESSORPLUGIN_H_DEFINED
-#define PROCESSORPLUGIN_H_DEFINED
+#ifndef NeuropixelsCAR_H_DEFINED
+#define NeuropixelsCAR_H_DEFINED
 
 #include <ProcessorHeaders.h>
 
+class NeuropixelsCARSettings
+{
 
-class ProcessorPlugin : public GenericProcessor
+public:
+
+	/** Constructor -- sets default values*/
+	NeuropixelsCARSettings() : numAdcs(0) { }
+
+	/** Holds the number of ADCs for this probe type*/
+	int numAdcs;
+
+	/** Channel groups inds for all channels*/
+	Array<int> channelGroups;
+
+	/** Mean values for each sample, for each channel group*/
+	Array<float> meanValues;
+
+	/** Set number of ADCs and initialize arrays */
+	void setNumAdcs(int count);
+
+};
+
+class NeuropixelsCAR : public GenericProcessor
 {
 public:
 	/** The class constructor, used to initialize any members. */
-	ProcessorPlugin();
+	NeuropixelsCAR();
 
 	/** The class destructor, used to deallocate memory */
-	~ProcessorPlugin();
+	~NeuropixelsCAR();
 
 	/** If the processor has a custom editor, this method must be defined to instantiate it. */
 	AudioProcessorEditor* createEditor() override;
@@ -49,28 +70,9 @@ public:
 		Visualizer plugins typically use this method to send data to the canvas for display purposes */
 	void process(AudioBuffer<float>& buffer) override;
 
-	/** Handles events received by the processor
-		Called automatically for each received event whenever checkForEvents() is called from
-		the plugin's process() method */
-	void handleTTLEvent(TTLEventPtr event) override;
+private:
 
-	/** Handles spikes received by the processor
-		Called automatically for each received spike whenever checkForEvents(true) is called from
-		the plugin's process() method */
-	void handleSpike(SpikePtr spike) override;
-
-	/** Handles broadcast messages sent during acquisition
-		Called automatically whenever a broadcast message is sent through the signal chain */
-	void handleBroadcastMessage(String message) override;
-
-	/** Saving custom settings to XML. This method is not needed to save the state of
-		Parameter objects */
-	void saveCustomParametersToXml(XmlElement* parentElement) override;
-
-	/** Load custom settings from XML. This method is not needed to load the state of
-		Parameter objects*/
-	void loadCustomParametersFromXml(XmlElement* parentElement) override;
-
+	StreamSettings<NeuropixelsCARSettings> settings;
 };
 
 #endif

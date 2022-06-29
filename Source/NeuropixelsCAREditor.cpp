@@ -20,71 +20,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "ProcessorPlugin.h"
+#include "NeuropixelsCAREditor.h"
 
-#include "ProcessorPluginEditor.h"
-
-
-ProcessorPlugin::ProcessorPlugin()
-    : GenericProcessor("Plugin Name")
+NeuropixelsCAREditor::NeuropixelsCAREditor(GenericProcessor* parentNode) 
+    : GenericEditor(parentNode)
 {
 
-}
-
-
-ProcessorPlugin::~ProcessorPlugin()
-{
-
-}
-
-
-AudioProcessorEditor* ProcessorPlugin::createEditor()
-{
-    editor = std::make_unique<ProcessorPluginEditor>(this);
-    return editor.get();
-}
-
-
-void ProcessorPlugin::updateSettings()
-{
-
-
-}
-
-
-void ProcessorPlugin::process(AudioBuffer<float>& buffer)
-{
-
-    checkForEvents(true);
-
-}
-
-
-void ProcessorPlugin::handleTTLEvent(TTLEventPtr event)
-{
-
-}
-
-
-void ProcessorPlugin::handleSpike(SpikePtr event)
-{
-
-}
-
-
-void ProcessorPlugin::handleBroadcastMessage(String message)
-{
-
-}
-
-
-void ProcessorPlugin::saveCustomParametersToXml(XmlElement* parentElement)
-{
-
-}
-
-
-void ProcessorPlugin::loadCustomParametersFromXml(XmlElement* parentElement)
-{
+    desiredWidth = 150;
 
 }

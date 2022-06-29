@@ -22,7 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <PluginInfo.h>
 
-#include "ProcessorPlugin.h"
+#include "NeuropixelsCAR.h"
 #include <string>
 
 #ifdef WIN32
@@ -42,7 +42,7 @@ extern "C" EXPORT void getLibInfo(Plugin::LibraryInfo* info)
 	Should not be changed to ensure it is always equal to the one used in the latest codebase.
 	The GUI refueses to load plugins with mismatched API versions */
 	info->apiVersion = PLUGIN_API_VER;
-	info->name = "Plugin Library Name"; // <---- update
+	info->name = "Neuropixels CAR"; // <---- update
 	info->libVersion = "0.1.0"; // <---- update
 	info->numPlugins = NUM_PLUGINS;
 }
@@ -57,13 +57,13 @@ extern "C" EXPORT int getPluginInfo(int index, Plugin::PluginInfo* info)
 		info->type = Plugin::Type::PROCESSOR;
 
 		//Processor name
-		info->processor.name = "Plugin Name"; //Processor name shown in the GUI
+		info->processor.name = "Neuropixels CAR"; //Processor name shown in the GUI
 
 		//Type of processor. Can be FILTER, SOURCE, SINK or UTILITY. Specifies where on the processor list will appear
 		info->processor.type = Processor::Type::FILTER;
 
 		//Class factory pointer. Replace "ProcessorPluginSpace::ProcessorPlugin" with the namespace and class name.
-		info->processor.creator = &(Plugin::createProcessor<ProcessorPlugin>);
+		info->processor.creator = &(Plugin::createProcessor<NeuropixelsCAR>);
 		break;
 	default:
 		return -1;
