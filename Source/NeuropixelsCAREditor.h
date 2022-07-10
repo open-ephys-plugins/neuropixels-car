@@ -35,7 +35,12 @@ public:
 	/** Destructor */
 	~NeuropixelsCAREditor() { }
 
+	/** Updates probe type label */
+	void selectedStreamHasChanged() override;
+
 private:
+
+	std::unique_ptr<Label> probeTypeLabel;
 
 	/** Generates an assertion if this class leaks */
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(NeuropixelsCAREditor);

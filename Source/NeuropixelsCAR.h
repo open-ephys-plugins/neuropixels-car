@@ -40,10 +40,19 @@ public:
 	Array<int> channelGroups;
 
 	/** Mean values for each sample, for each channel group*/
-	Array<float> meanValues;
+	AudioBuffer<float> buffer;
+
+	/** Number of channels active in each group*/
+	Array<float> channelCounts;
 
 	/** Set number of ADCs and initialize arrays */
 	void setNumAdcs(int count);
+
+	/** Reset channel counts to 0*/
+	void resetCounts();
+
+	/** Device name*/
+	String name;
 
 };
 
@@ -69,6 +78,9 @@ public:
 		The process method is called every time a new data buffer is available.
 		Visualizer plugins typically use this method to send data to the canvas for display purposes */
 	void process(AudioBuffer<float>& buffer) override;
+
+	/** Returns the device name for a given stream*/
+	String getDeviceName(uint16 stream);
 
 private:
 

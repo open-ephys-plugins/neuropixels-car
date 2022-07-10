@@ -22,10 +22,27 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "NeuropixelsCAREditor.h"
 
+#include "NeuropixelsCAR.h"
+
 NeuropixelsCAREditor::NeuropixelsCAREditor(GenericProcessor* parentNode) 
     : GenericEditor(parentNode)
 {
 
     desiredWidth = 150;
 
+    probeTypeLabel = std::make_unique<Label>("Probe Type", "Probe Type");
+    probeTypeLabel->setBounds(20, 20, 110, 70);
+    addAndMakeVisible(probeTypeLabel.get());
+
+    addMaskChannelsParameterEditor("Channels", 30, 98);
+
 }
+
+
+void NeuropixelsCAREditor::selectedStreamHasChanged()
+{
+    NeuropixelsCAR* processor = (NeuropixelsCAR*) getProcessor();
+
+    probeTypeLabel->setText(processor->getDeviceName(getCurrentStream()), dontSendNotification);
+}
+

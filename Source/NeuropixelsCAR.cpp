@@ -28,7 +28,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 void NeuropixelsCARSettings::setNumAdcs(int count)
 {
     channelGroups.clear();
-    meanValues.clear();
+    channelCounts.clear();
 
     if (count == 32)
     {
@@ -37,7 +37,8 @@ void NeuropixelsCARSettings::setNumAdcs(int count)
             channelGroups.add((i / 2) % 12);
         }
 
-        meanValues.insertMultiple(0, 0.0f, 12);
+        channelCounts.insertMultiple(0, 0, 12);
+        buffer.setSize(12, 10000);
     }
     else if (count == 24)
     {
@@ -46,15 +47,24 @@ void NeuropixelsCARSettings::setNumAdcs(int count)
             channelGroups.add((i / 2) % 16);
         }
 
-        meanValues.insertMultiple(0, 0.0f, 16);
+        channelCounts.insertMultiple(0, 0, 16);
+        buffer.setSize(16, 10000);
     }
 
+}
+
+void NeuropixelsCARSettings::resetCounts()
+{
+    for (int i = 0; i < channelCounts.size(); i++)
+    {
+        channelCounts.set(i, 0);
+    }
 }
 
 NeuropixelsCAR::NeuropixelsCAR()
     : GenericProcessor("Neuropixels CAR")
 {
-
+    addMaskChannelsParameter(Parameter::STREAM_SCOPE, "Channels", "Channels to use for this stream");
 }
 
 
@@ -70,6 +80,13 @@ AudioProcessorEditor* NeuropixelsCAR::createEditor()
     return editor.get();
 }
 
+String NeuropixelsCAR::getDeviceName(uint16 streamId)
+{
+    if (streamId > 0)
+        return settings[streamId]->name;
+    else
+        return "No device detected.";
+}
 
 void NeuropixelsCAR::updateSettings()
 {
@@ -94,6 +111,10 @@ void NeuropixelsCAR::updateSettings()
                 std::cout << "Num adcs: " << num_adcs << std::endl;
 
                 settings[stream->getStreamId()]->setNumAdcs(num_adcs);
+                settings[stream->getStreamId()]->name = stream->device->getName();
+            }
+            else {
+                settings[stream->getStreamId()]->name = "No Neuropixels detected.";
             }
         }
     }
@@ -117,48 +138,52 @@ void NeuropixelsCAR::process(AudioBuffer<float>& buffer)
                 const uint16 streamId = stream->getStreamId();
                 const uint32 numSamples = getNumSamplesInBlock(streamId);
 
-                for (int i = 0; i < numSamples; i++)
+                if (numSamples > 0)
                 {
-                    streamSettings->meanValues.fill(0.0f);
+
+                    streamSettings->buffer.clear();
+                    streamSettings->resetCounts();
 
                     // Sum sample values for each group
-                    for (int ch = 0; ch < stream->getChannelCount(); ch++)
+                    for (auto localChannelIndex : *((*stream)["Channels"].getArray()))
                     {
+                        int ch = int(localChannelIndex);
+
                         if (ch < 384)
                         {
                             int group = streamSettings->channelGroups[ch];
                             int globalChannelIndex = getGlobalChannelIndex(stream->getStreamId(), ch);
 
-                            float currentValue = streamSettings->meanValues[group];
+                            streamSettings->buffer.copyFrom(group,
+                                0,
+                                buffer.getReadPointer(globalChannelIndex, 0),
+                                numSamples);
 
-                            streamSettings->meanValues.set(group,
-                                currentValue + *buffer.getReadPointer(globalChannelIndex, i));
+                            streamSettings->channelCounts.set(group, streamSettings->channelCounts[group] + 1);
                         }
                     }
 
-                    // Calculate the mean sample value
-                    for (int group = 0; group < streamSettings->meanValues.size(); group++)
+                    // Calculate the mean sample values
+                    for (int group = 0; group < streamSettings->buffer.getNumChannels(); group++)
                     {
-                        float mean = streamSettings->meanValues[group] / streamSettings->numAdcs;
-                        streamSettings->meanValues.set(group, mean);
+                        streamSettings->buffer.applyGain(group, 0, numSamples, 1 / streamSettings->channelCounts[group]);
                     }
 
                     // Subtract the mean sample value by group
-                    for (int ch = 0; ch < stream->getChannelCount(); ch++)
+                    for (auto localChannelIndex : *((*stream)["Channels"].getArray()))
                     {
+                        
+                        int ch = int(localChannelIndex);
+
                         if (ch < 384)
                         {
                             int group = streamSettings->channelGroups[ch];
                             int globalChannelIndex = getGlobalChannelIndex(stream->getStreamId(), ch);
 
-                            float meanValue = streamSettings->meanValues[group];
-
-                            float* writePointer = buffer.getWritePointer(globalChannelIndex, i);
-                            *writePointer = *writePointer - meanValue;
+                            buffer.addFrom(globalChannelIndex, 0, streamSettings->buffer.getReadPointer(group), numSamples, -1.0f);
                         }
                     }
                 }
-
             }
         }
     }
