@@ -30,7 +30,9 @@ void NeuropixelsCARSettings::setNumAdcs(int count)
     channelGroups.clear();
     channelCounts.clear();
 
-    if (count == 32)
+    numAdcs = count;
+
+    if (numAdcs == 32)
     {
         for (int i = 0; i < 384; i++)
         {
@@ -40,7 +42,7 @@ void NeuropixelsCARSettings::setNumAdcs(int count)
         channelCounts.insertMultiple(0, 0, 12);
         buffer.setSize(12, 10000);
     }
-    else if (count == 24)
+    else if (numAdcs == 24)
     {
         for (int i = 0; i < 384; i++)
         {
@@ -107,8 +109,6 @@ void NeuropixelsCAR::updateSettings()
                 const MetadataValue* value = stream->device->getMetadataValue(adcMetadataIndex);
                 uint16 num_adcs;
                 value->getValue(&num_adcs);
-                std::cout << stream->device->getName() << std::endl;
-                std::cout << "Num adcs: " << num_adcs << std::endl;
 
                 settings[stream->getStreamId()]->setNumAdcs(num_adcs);
                 settings[stream->getStreamId()]->name = stream->device->getName();
@@ -130,12 +130,14 @@ void NeuropixelsCAR::process(AudioBuffer<float>& buffer)
 
         if ((*stream)["enable_stream"])
         {
-            NeuropixelsCARSettings* streamSettings = settings[stream->getStreamId()];
+
+            const uint16 streamId = stream->getStreamId();
+
+            NeuropixelsCARSettings* streamSettings = settings[streamId];
 
             if (streamSettings->numAdcs > 0)
             {
 
-                const uint16 streamId = stream->getStreamId();
                 const uint32 numSamples = getNumSamplesInBlock(streamId);
 
                 if (numSamples > 0)
@@ -152,21 +154,21 @@ void NeuropixelsCAR::process(AudioBuffer<float>& buffer)
                         if (ch < 384)
                         {
                             int group = streamSettings->channelGroups[ch];
-                            int globalChannelIndex = getGlobalChannelIndex(stream->getStreamId(), ch);
+                            int globalChannelIndex = getGlobalChannelIndex(streamId, ch);
 
-                            streamSettings->buffer.copyFrom(group,
+                            streamSettings->buffer.addFrom(group,
                                 0,
                                 buffer.getReadPointer(globalChannelIndex, 0),
                                 numSamples);
 
-                            streamSettings->channelCounts.set(group, streamSettings->channelCounts[group] + 1);
+                            streamSettings->channelCounts.set(group, streamSettings->channelCounts[group] + 1.0f);
                         }
                     }
 
                     // Calculate the mean sample values
                     for (int group = 0; group < streamSettings->buffer.getNumChannels(); group++)
                     {
-                        streamSettings->buffer.applyGain(group, 0, numSamples, 1 / streamSettings->channelCounts[group]);
+                        streamSettings->buffer.applyGain(group, 0, numSamples, 1.0f / streamSettings->channelCounts[group]);
                     }
 
                     // Subtract the mean sample value by group
@@ -178,7 +180,7 @@ void NeuropixelsCAR::process(AudioBuffer<float>& buffer)
                         if (ch < 384)
                         {
                             int group = streamSettings->channelGroups[ch];
-                            int globalChannelIndex = getGlobalChannelIndex(stream->getStreamId(), ch);
+                            int globalChannelIndex = getGlobalChannelIndex(streamId, ch);
 
                             buffer.addFrom(globalChannelIndex, 0, streamSettings->buffer.getReadPointer(group), numSamples, -1.0f);
                         }

@@ -34,7 +34,7 @@ public:
 	NeuropixelsCARSettings() : numAdcs(0) { }
 
 	/** Holds the number of ADCs for this probe type*/
-	int numAdcs;
+	int numAdcs = 0;
 
 	/** Channel groups inds for all channels*/
 	Array<int> channelGroups;
