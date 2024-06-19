@@ -66,7 +66,7 @@ void NeuropixelsCARSettings::resetCounts()
 NeuropixelsCAR::NeuropixelsCAR()
     : GenericProcessor("Neuropixels CAR")
 {
-    addMaskChannelsParameter(Parameter::STREAM_SCOPE, "Channels", "Channels to use for this stream");
+
 }
 
 
@@ -75,10 +75,16 @@ NeuropixelsCAR::~NeuropixelsCAR()
 
 }
 
+void NeuropixelsCAR::registerParameters()
+{
+    addMaskChannelsParameter(Parameter::STREAM_SCOPE, "Channels", "Channels", "Channels to use for this stream");
+}
+
 
 AudioProcessorEditor* NeuropixelsCAR::createEditor()
 {
     editor = std::make_unique<NeuropixelsCAREditor>(this);
+    editor->setDisplayName ("Neuropix CAR");
     return editor.get();
 }
 

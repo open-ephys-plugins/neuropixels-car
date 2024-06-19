@@ -65,6 +65,9 @@ public:
 	/** The class destructor, used to deallocate memory */
 	~NeuropixelsCAR();
 
+	/** Register parameters needed for the plugin */
+	void registerParameters() override;
+
 	/** If the processor has a custom editor, this method must be defined to instantiate it. */
 	AudioProcessorEditor* createEditor() override;
 
