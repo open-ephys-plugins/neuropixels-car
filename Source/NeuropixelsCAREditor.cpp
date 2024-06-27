@@ -28,15 +28,15 @@ NeuropixelsCAREditor::NeuropixelsCAREditor(GenericProcessor* parentNode)
     : GenericEditor(parentNode)
 {
 
-    desiredWidth = 150;
+    desiredWidth = 170;
 
     probeTypeLabel = std::make_unique<Label>("Probe Type", "Probe Type");
     probeTypeLabel->setFont (FontOptions ("Inter", "Regular", 16.0f));
     probeTypeLabel->setJustificationType(Justification::centred);
-    probeTypeLabel->setBounds(20, 30, 110, 30);
+    probeTypeLabel->setBounds(10, 30, 150, 30);
     addAndMakeVisible(probeTypeLabel.get());
 
-    addMaskChannelsParameterEditor(Parameter::STREAM_SCOPE, "Channels", 25, 65);
+    addMaskChannelsParameterEditor(Parameter::STREAM_SCOPE, "Channels", 35, 65);
     auto maskChannelsEditor = getParameterEditor("Channels");
     maskChannelsEditor->setSize(100, 40);
     maskChannelsEditor->setLayout(ParameterEditor::Layout::nameOnTop);

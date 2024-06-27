@@ -84,7 +84,6 @@ void NeuropixelsCAR::registerParameters()
 AudioProcessorEditor* NeuropixelsCAR::createEditor()
 {
     editor = std::make_unique<NeuropixelsCAREditor>(this);
-    editor->setDisplayName ("Neuropix CAR");
     return editor.get();
 }
 
@@ -103,6 +102,8 @@ void NeuropixelsCAR::updateSettings()
 
     for (auto stream : dataStreams)
     {
+        String deviceName = "No Neuropixels detected.";
+
         if (stream->device != nullptr)
         {
             int adcMetadataIndex = stream->device->findMetadata(
@@ -117,12 +118,11 @@ void NeuropixelsCAR::updateSettings()
                 value->getValue(&num_adcs);
 
                 settings[stream->getStreamId()]->setNumAdcs(num_adcs);
-                settings[stream->getStreamId()]->name = stream->device->getName();
-            }
-            else {
-                settings[stream->getStreamId()]->name = "No Neuropixels detected.";
+                deviceName = stream->device->getName();
             }
         }
+
+        settings[stream->getStreamId()]->name = deviceName;
     }
 
 }
