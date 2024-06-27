@@ -27,67 +27,63 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 class NeuropixelsCARSettings
 {
-
 public:
+    /** Constructor -- sets default values*/
+    NeuropixelsCARSettings() : numAdcs (0) {}
 
-	/** Constructor -- sets default values*/
-	NeuropixelsCARSettings() : numAdcs(0) { }
+    /** Holds the number of ADCs for this probe type*/
+    int numAdcs = 0;
 
-	/** Holds the number of ADCs for this probe type*/
-	int numAdcs = 0;
+    /** Channel groups inds for all channels*/
+    Array<int> channelGroups;
 
-	/** Channel groups inds for all channels*/
-	Array<int> channelGroups;
+    /** Mean values for each sample, for each channel group*/
+    AudioBuffer<float> buffer;
 
-	/** Mean values for each sample, for each channel group*/
-	AudioBuffer<float> buffer;
+    /** Number of channels active in each group*/
+    Array<float> channelCounts;
 
-	/** Number of channels active in each group*/
-	Array<float> channelCounts;
+    /** Set number of ADCs and initialize arrays */
+    void setNumAdcs (int count);
 
-	/** Set number of ADCs and initialize arrays */
-	void setNumAdcs(int count);
+    /** Reset channel counts to 0*/
+    void resetCounts();
 
-	/** Reset channel counts to 0*/
-	void resetCounts();
-
-	/** Device name*/
-	String name;
-
+    /** Device name*/
+    String name;
 };
 
 class NeuropixelsCAR : public GenericProcessor
 {
 public:
-	/** The class constructor, used to initialize any members. */
-	NeuropixelsCAR();
+    /** The class constructor, used to initialize any members. */
+    NeuropixelsCAR();
 
-	/** The class destructor, used to deallocate memory */
-	~NeuropixelsCAR();
+    /** The class destructor, used to deallocate memory */
+    ~NeuropixelsCAR();
 
-	/** Register parameters needed for the plugin */
-	void registerParameters() override;
+    /** Register parameters needed for the plugin */
+    void registerParameters() override;
 
-	/** If the processor has a custom editor, this method must be defined to instantiate it. */
-	AudioProcessorEditor* createEditor() override;
+    /** If the processor has a custom editor, this method must be defined to instantiate it. */
+    AudioProcessorEditor* createEditor() override;
 
-	/** Called every time the settings of an upstream plugin are changed.
-		Allows the processor to handle variations in the channel configuration or any other parameter
-		passed through signal chain. The processor can use this function to modify channel objects that
-		will be passed to downstream plugins. */
-	void updateSettings() override;
+    /** Called every time the settings of an upstream plugin are changed.
+        Allows the processor to handle variations in the channel configuration or any other parameter
+        passed through signal chain. The processor can use this function to modify channel objects that
+        will be passed to downstream plugins. */
+    void updateSettings() override;
 
-	/** Defines the functionality of the processor.
-		The process method is called every time a new data buffer is available.
-		Visualizer plugins typically use this method to send data to the canvas for display purposes */
-	void process(AudioBuffer<float>& buffer) override;
+    /** Defines the functionality of the processor.
+        The process method is called every time a new data buffer is available.
+        Visualizer plugins typically use this method to send data to the canvas for display purposes */
+    void process (AudioBuffer<float>& buffer) override;
 
-	/** Returns the device name for a given stream*/
-	String getDeviceName(uint16 stream);
+    /** Returns the device name for a given stream*/
+    String getDeviceName (uint16 stream);
 
 private:
-
-	StreamSettings<NeuropixelsCARSettings> settings;
+    StreamSettings<NeuropixelsCARSettings> settings;
 };
 
 #endif

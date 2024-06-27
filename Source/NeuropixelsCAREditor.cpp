@@ -24,29 +24,26 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "NeuropixelsCAR.h"
 
-NeuropixelsCAREditor::NeuropixelsCAREditor(GenericProcessor* parentNode) 
-    : GenericEditor(parentNode)
+NeuropixelsCAREditor::NeuropixelsCAREditor (GenericProcessor* parentNode)
+    : GenericEditor (parentNode)
 {
-
     desiredWidth = 170;
 
-    probeTypeLabel = std::make_unique<Label>("Probe Type", "Probe Type");
+    probeTypeLabel = std::make_unique<Label> ("Probe Type", "Probe Type");
     probeTypeLabel->setFont (FontOptions ("Inter", "Regular", 16.0f));
-    probeTypeLabel->setJustificationType(Justification::centred);
-    probeTypeLabel->setBounds(10, 30, 150, 30);
-    addAndMakeVisible(probeTypeLabel.get());
+    probeTypeLabel->setJustificationType (Justification::centred);
+    probeTypeLabel->setBounds (10, 30, 150, 30);
+    addAndMakeVisible (probeTypeLabel.get());
 
-    addMaskChannelsParameterEditor(Parameter::STREAM_SCOPE, "Channels", 35, 65);
-    auto maskChannelsEditor = getParameterEditor("Channels");
-    maskChannelsEditor->setSize(100, 40);
-    maskChannelsEditor->setLayout(ParameterEditor::Layout::nameOnTop);
+    addMaskChannelsParameterEditor (Parameter::STREAM_SCOPE, "Channels", 35, 65);
+    auto maskChannelsEditor = getParameterEditor ("Channels");
+    maskChannelsEditor->setSize (100, 40);
+    maskChannelsEditor->setLayout (ParameterEditor::Layout::nameOnTop);
 }
-
 
 void NeuropixelsCAREditor::selectedStreamHasChanged()
 {
     NeuropixelsCAR* processor = (NeuropixelsCAR*) getProcessor();
 
-    probeTypeLabel->setText(processor->getDeviceName(getCurrentStream()), dontSendNotification);
+    probeTypeLabel->setText (processor->getDeviceName (getCurrentStream()), dontSendNotification);
 }
-

@@ -28,22 +28,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 class NeuropixelsCAREditor : public GenericEditor
 {
 public:
+    /** Constructor */
+    NeuropixelsCAREditor (GenericProcessor* parentNode);
 
-	/** Constructor */
-	NeuropixelsCAREditor(GenericProcessor* parentNode);
+    /** Destructor */
+    ~NeuropixelsCAREditor() {}
 
-	/** Destructor */
-	~NeuropixelsCAREditor() { }
-
-	/** Updates probe type label */
-	void selectedStreamHasChanged() override;
+    /** Updates probe type label */
+    void selectedStreamHasChanged() override;
 
 private:
+    std::unique_ptr<Label> probeTypeLabel;
 
-	std::unique_ptr<Label> probeTypeLabel;
-
-	/** Generates an assertion if this class leaks */
-	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(NeuropixelsCAREditor);
+    /** Generates an assertion if this class leaks */
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (NeuropixelsCAREditor);
 };
 
 #endif // NeuropixelsCAREDITOR_H_DEFINED
